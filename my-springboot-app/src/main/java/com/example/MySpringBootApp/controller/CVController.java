@@ -14,8 +14,11 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.example.MySpringBootApp.service.CVAnalysisService;
+import com.example.MySpringBootApp.service.CareerPathService;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 @RestController
@@ -27,6 +30,9 @@ public class CVController {
     @Autowired
     private CVAnalysisService cvAnalysisService;
 
+    @Autowired
+    private CareerPathService careerPathService;
+
     // The view will be generated using the following steps:
     // 1. Upload the CV
     @PostMapping("/uploadCV")
@@ -35,7 +41,16 @@ public class CVController {
             return new ResponseEntity<>("Please upload a file!", HttpStatus.BAD_REQUEST);
         }
 
-        // You can add logic here to save the file to the server or database
+        // Save the file to the server
+        try {
+            File serverFile = new File("uploads/" + file.getOriginalFilename());
+            serverFile.getParentFile().mkdirs(); // Ensure the directory exists
+            try (FileOutputStream fos = new FileOutputStream(serverFile)) {
+                fos.write(file.getBytes());
+            }
+        } catch (IOException e) {
+            return new ResponseEntity<>("Failed to save file", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         return new ResponseEntity<>("File uploaded successfully!", HttpStatus.OK);
     }
@@ -68,8 +83,14 @@ public class CVController {
 
         // Add logic here to generate the career path
         // For example, you can use predefined rules or a machine learning model to generate the career path
+        try {
+            String cvContent = new String(file.getBytes());
+            String careerPath = careerPathService.generateCareerPath(cvContent);
 
-        return new ResponseEntity<>("Career path generated successfully!", HttpStatus.OK);
+            return new ResponseEntity<>(careerPath, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Failed to generate career path", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 4. Store the view in the database

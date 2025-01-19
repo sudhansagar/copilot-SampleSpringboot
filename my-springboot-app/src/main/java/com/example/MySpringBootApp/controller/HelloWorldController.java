@@ -44,13 +44,6 @@ public class HelloWorldController {
     // 6. Generate the view in the form of a PDF
     // 7. Generate the view in the form of a web page
 
-    // The view will be generated using the following resources:
-    // 1. Java Spring Boot
-    // 2. React.js
-    // 3. MySQL
-    // 4. HTML/CSS
-    // 5. Bootstrap
-
     // The view will be generated in the following timeframe:
     // 1. 1 week for analyzing the CV
     // 2. 2 weeks for generating the career path
