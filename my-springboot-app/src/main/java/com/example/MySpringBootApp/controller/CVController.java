@@ -13,14 +13,19 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.example.MySpringBootApp.service.CVAnalysisService;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 @RestController
 public class CVController {
 
     @Autowired
     private CVRepository cvRepository;
+
+    @Autowired
+    private CVAnalysisService cvAnalysisService;
 
     // The view will be generated using the following steps:
     // 1. Upload the CV
@@ -44,8 +49,14 @@ public class CVController {
 
         // Add logic here to analyze the CV
         // For example, you can use a third-party library or service to parse and analyze the CV content
+        try {
+            String cvContent = new String(file.getBytes());
+            String analysisResult = cvAnalysisService.analyze(cvContent);
 
-        return new ResponseEntity<>("CV analyzed successfully!", HttpStatus.OK);
+            return new ResponseEntity<>(analysisResult, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Failed to analyze CV", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 3. Generate the career path matching towards Solution Architect
